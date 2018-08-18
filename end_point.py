@@ -14,11 +14,12 @@ def index():
 
 @app.route("/diet", methods=["GET"])
 def diet():
-    if not check.is_valid_key(request):
+    if not check.is_valid_key(request.args):
         return jsonify({"error":"invalid input format."}), 400
-    elif not check.is_valid_data(request):
+    elif not check.is_valid_data(request.args):
         return jsonify({"error": "Invalid data."}), 400
 
-    query_data = check.wrapper(request)
+    query_data = check.wrapper(request.args)
     
     return jsonify(get_diet.request(json.dumps(query_data))), 200
+
