@@ -6,6 +6,8 @@ import warnings
 warnings.simplefilter(action = "ignore", category = RuntimeWarning)
 import pandas as pd
 
+import check
+
 def load_data(lan="en"):
     serving = pd.read_csv("data/{0}/servings_per_day-{0}_ONPP.csv".format(lan), index_col=False, encoding="ISO-8859-1")
     food = pd.read_csv("data/{0}/foods-{0}_ONPP_rev.csv".format(lan), index_col=False, encoding="ISO-8859-1")
@@ -68,13 +70,21 @@ class RequestDiet():
 
 if __name__ == "__main__":
     
-    parser = argparse.ArgumentParser(description='Show balance diet.')
+    parser = argparse.ArgumentParser(description="Show balance diet.")
     parser.add_argument("-g", "--gender", help = "Target gender.")
     parser.add_argument("-a", "--age", help = "Target age.")
     
     args = parser.parse_args()
     
-    get = RequestDiet()
-    print get.request('{"gender": "Female", "ages": "14 to 18"}')   #14 to 18 problem
+    request = {}
+    request["gender"] = args.gender
+    request["ages"] = args.age
     
+    if check.is_valid_data(request):
+        query = check.wrapper(request)
+    
+        get = RequestDiet()
+        print get.request(json.dumps(query))
+    else:
+        print "Invalid data."
 
