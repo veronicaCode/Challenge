@@ -6,19 +6,26 @@ warnings.simplefilter(action = "ignore", category = RuntimeWarning)
 import pandas as pd
 
 def load_data(lan="en"):
-    serving = pd.read_csv("data/{0}/servings_per_day-{0}_ONPP.csv".format(lan), index_col=False)
-    food = pd.read_csv("data/{0}/foods-{0}_ONPP_rev.csv".format(lan), index_col=False)
+    serving = pd.read_csv("data/{0}/servings_per_day-{0}_ONPP.csv".format(lan), index_col=False, encoding="ISO-8859-1")
+    food = pd.read_csv("data/{0}/foods-{0}_ONPP_rev.csv".format(lan), index_col=False, encoding="ISO-8859-1")
     group = pd.read_csv("data/en/foodgroups-en_ONPP.csv")
     return serving, food, group
 
 class RequestDiet():
     
-    def to_df(crs, csv_path):
-        df = pd.read_csv(csv_path)
+    def to_df(self, csv_path):
+        df = pd.read_csv(csv_path, encoding="ISO-8859-1")
         col = df.columns
         col = [x.strip() for x in col]
         df.columns = col
         return df
+    
+    def print_handle(slef, msg):
+        msg = msg.replace("\u00bd", " 1/2")
+        msg = msg.replace("\u00bc", " 1/4")
+        msg = msg.replace("\u00be", " 3/4")
+        return msg
+    
     
     def __init__(self):
         self.serving = self.to_df("data/en/servings_per_day-en_ONPP.csv")
@@ -49,7 +56,9 @@ class RequestDiet():
                               .reset_index().rename(columns={0:'serving'})\
                               .to_json(orient='records')
         
-        return response
+        response = self.print_handle(response)
+        
+        return json.loads(response.decode('utf-8'))
 
             
 
@@ -82,4 +91,5 @@ if __name__ == "__main__":
                            .apply(lambda x: x[reply_format].to_dict('r'))\
                            .reset_index().rename(columns={0:'serving'})\
                            .to_json(orient='records')
-    print response
+    print json.loads(response)
+    #print response.replace("\xbd", " 1/2")
