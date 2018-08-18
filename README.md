@@ -12,7 +12,7 @@ Example:
 
 To use webservice, the key and the value should follow the rules.
 
-gender  : could be [Female/Male/F/M/f/m]
+gender  : could be [Female/Male/F/M/f/m] <br> 
 ages    : range 2 ~ 120
 
 <pre>http://54.196.135.79/diet?gender=&lt;gender&gt;&ages=&lt;age&gt; </pre>
