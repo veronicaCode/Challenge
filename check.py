@@ -15,7 +15,7 @@ def is_valid_data(request):
     if request["gender"].lower() in F_GENDER_LIST or \
        request["gender"].lower() in M_GENDER_LIST:
         if request["ages"].lower() in AGE_LIST or \
-           (request["ages"].isdigit() and\
+           (request["ages"].isdigit() and \
            120 >= int(request["ages"]) >= 2):
             return True
         return False
@@ -39,5 +39,4 @@ def wrapper(request):
                 break
     
     return query_data            
-    
    

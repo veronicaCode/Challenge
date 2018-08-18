@@ -8,11 +8,6 @@ import pandas as pd
 
 import check
 
-def load_data(lan="en"):
-    serving = pd.read_csv("data/{0}/servings_per_day-{0}_ONPP.csv".format(lan), index_col=False, encoding="ISO-8859-1")
-    food = pd.read_csv("data/{0}/foods-{0}_ONPP_rev.csv".format(lan), index_col=False, encoding="ISO-8859-1")
-    group = pd.read_csv("data/en/foodgroups-en_ONPP.csv")
-    return serving, food, group
 
 class RequestDiet():
     
@@ -28,7 +23,6 @@ class RequestDiet():
         msg = msg.replace("\u00bc", " 1/4")
         msg = msg.replace("\u00be", " 3/4")
         return msg
-    
     
     def __init__(self):
         self.serving = self.to_df("data/en/servings_per_day-en_ONPP.csv")
@@ -64,8 +58,6 @@ class RequestDiet():
         response = self.print_handle(response)
         
         return json.loads(response.decode('utf-8'))
-
-            
 
 
 if __name__ == "__main__":

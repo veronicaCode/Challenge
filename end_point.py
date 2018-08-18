@@ -22,3 +22,4 @@ def diet():
     query_data = check.wrapper(request.args)
     
     return jsonify(get_diet.request(json.dumps(query_data))), 200
+
