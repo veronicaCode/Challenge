@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import argparse
 import warnings
@@ -41,17 +42,19 @@ class RequestDiet():
         
         df = self.serving[(self.serving["gender"] == meta["gender"]) & \
                      (self.serving["ages"] == meta["ages"])]
-        
+        basic_data = self.group.merge(df, on=["fgid"])
+
         food_cho = []
         for fgid, serving in zip(df["fgid"], df["servings"]):
-            food_cho.append(self.food[(self.food["fgid"] == fgid)].sample(int(serving)))
+            amount = int(re.search('\d$', serving).group(0))
+            food_cho.append(self.food[(self.food["fgid"] == fgid)].sample(amount))
         
         food_cho_df = pd.concat(food_cho)
-        food_cho_df = food_cho_df.merge(self.group, on=["fgid", "fgcat_id"])
+        food_cho_df = food_cho_df.merge(basic_data, on=["fgid", "fgcat_id"])
         
         reply_format = ["food", "fgcat", "srvg_sz"]
         
-        response = food_cho_df.groupby(["foodgroup"])\
+        response = food_cho_df.groupby(["foodgroup", "servings"])\
                               .apply(lambda x: x[reply_format].to_dict('r'))\
                               .reset_index().rename(columns={0:'serving'})\
                               .to_json(orient='records')
@@ -72,24 +75,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     get = RequestDiet()
-    print get.request('{"gender": "Female", "ages": "4 to 8"}')
+    print get.request('{"gender": "Female", "ages": "14 to 18"}')   #14 to 18 problem
     
-    serving, food, group = load_data()
-    df = serving[(serving["gender"] == args.gender) & (serving["ages"] == args.age)]
-    food_cho = []
-    for x, y in zip(df["fgid"], df["servings"]):
-        food_cho.append(food[(food["fgid"] == x)].sample(int(y)))
-    
-    food_cho_df = pd.concat(food_cho)
-    col = food_cho_df.columns
-    col = [x.strip() for x in col]
-    food_cho_df.columns = col
-    fod_cho_df = food_cho_df.drop(columns=['Unnamed: 4'])
-    food_cho_df = food_cho_df.merge(group, on=["fgid", "fgcat_id"])
-    reply_format = ["food", "fgcat", "srvg_sz"]
-    response =  food_cho_df.groupby(["foodgroup"])\
-                           .apply(lambda x: x[reply_format].to_dict('r'))\
-                           .reset_index().rename(columns={0:'serving'})\
-                           .to_json(orient='records')
-    print json.loads(response)
-    #print response.replace("\xbd", " 1/2")
+
