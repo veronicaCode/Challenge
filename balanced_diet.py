@@ -42,7 +42,7 @@ class RequestDiet():
 
         food_cho = []
         for fgid, serving in zip(df["fgid"], df["servings"]):
-            amount = int(re.search('\d$', serving).group(0))
+            amount = int(re.search('\d+$', serving).group(0))
             food_cho.append(self.food[(self.food["fgid"] == fgid)].sample(amount))
         
         food_cho_df = pd.concat(food_cho)
